@@ -118,6 +118,28 @@ class Config
     }
 
     /**
+     * Core's password-reset throttling, which a bulk release runs straight into.
+     *
+     * @param int|null $storeId
+     * @return array{type: int, max: int}
+     */
+    public function getResetProtection(?int $storeId): array
+    {
+        return [
+            'type' => (int)$this->scopeConfig->getValue(
+                'customer/password/password_reset_protection_type',
+                ScopeInterface::SCOPE_STORE,
+                $storeId
+            ),
+            'max' => (int)$this->scopeConfig->getValue(
+                'customer/password/max_number_password_reset_requests',
+                ScopeInterface::SCOPE_STORE,
+                $storeId
+            ),
+        ];
+    }
+
+    /**
      * Sender identity for the release mail, taken from core's forgot-password identity.
      *
      * @param int|null $storeId

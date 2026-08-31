@@ -96,6 +96,39 @@ Both `id` and `token` are required. `CreatePassword` calls `validateResetPasswor
 
 The sender identity and the template both resolve from the customer's own store, under store emulation. That is the point of the emulation: a CLI run has no store context, and without it every migrated customer would be mailed in the default store's language regardless of where they were created.
 
+## Core throttles password resets, and a batch runs into it
+
+The single most likely thing to go wrong on go-live morning, so the command checks for it before sending anything.
+
+Magento throttles password resets in `Magento_Security`, and the shipped defaults are:
+
+| Setting | Default |
+|---|---|
+| `customer/password/password_reset_protection_type` | `1` — By IP and Email |
+| `customer/password/max_number_password_reset_requests` | `5` |
+| `customer/password/min_time_between_password_reset_requests` | `10` (minutes) |
+
+The checker matches on **IP *or* account reference**. Every send from the CLI is recorded with an *empty* IP — `RemoteAddress::getRemoteAddress()` returns `false` outside a web request — so the whole batch shares one grouping key and the quantity cap applies across the entire run rather than per customer. Measured on 2.4.8-p5: a batch of six sent one and failed five.
+
+`--sleep` does not help. The limit is a count inside a time window, not a rate.
+
+**The command refuses the batch rather than discovering this one customer at a time**, and prints the fix:
+
+```bash
+bin/magento config:set customer/password/password_reset_protection_type 3   # By Email
+bin/magento cache:flush
+bin/magento brocode:customer-mail:release --website=1 --created-after=2026-08-01
+bin/magento config:set customer/password/password_reset_protection_type 1   # put it back
+bin/magento cache:flush
+```
+
+With **By Email**, each customer is its own grouping key and a batch of distinct addresses goes through — verified, five of six sent. The sixth failed correctly: it had been mailed minutes earlier, and the 10-minute per-account frequency check still applies. That is the same rule that makes a re-run within ten minutes fail for anyone already mailed, which is worth knowing alongside the idempotency note above.
+
+`--ignore-reset-throttle` proceeds anyway if you want the failures.
+
+**The migration-template path does not go through this.** When a template override is configured the module mints the token itself and sends directly, so no reset event is recorded and core's throttling never applies. That is convenient for a large release and it is a genuine divergence from core's behaviour — it is called out here rather than left to be discovered, and it is a reason to keep the override unset unless the migration wording is actually wanted.
+
+
 ## Why there is no table
 
 The first design recorded who had been suppressed. Executing the states showed it was unnecessary — both populations are already expressed on `customer_entity`:

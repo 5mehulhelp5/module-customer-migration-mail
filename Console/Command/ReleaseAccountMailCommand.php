@@ -30,6 +30,7 @@ declare(strict_types=1);
 namespace BroCode\CustomerMigrationMail\Console\Command;
 
 use BroCode\CustomerMigrationMail\Model\AccountMailSender;
+use BroCode\CustomerMigrationMail\Model\Config;
 use BroCode\CustomerMigrationMail\Model\ResourceModel\GetCustomersNeedingMail;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
@@ -50,6 +51,7 @@ class ReleaseAccountMailCommand extends Command
     private const OPT_SLEEP = 'sleep';
     private const OPT_CUSTOMER = 'customer';
     private const OPT_CONFIRMATION = 'confirmation';
+    private const OPT_IGNORE_THROTTLE = 'ignore-reset-throttle';
 
     /**
      * @var GetCustomersNeedingMail
@@ -67,20 +69,28 @@ class ReleaseAccountMailCommand extends Command
     private $appState;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @param GetCustomersNeedingMail $getCustomers
      * @param AccountMailSender $sender
      * @param State $appState
+     * @param Config $config
      * @param string|null $name
      */
     public function __construct(
         GetCustomersNeedingMail $getCustomers,
         AccountMailSender $sender,
         State $appState,
+        Config $config,
         ?string $name = null
     ) {
         $this->getCustomers = $getCustomers;
         $this->sender = $sender;
         $this->appState = $appState;
+        $this->config = $config;
         parent::__construct($name);
     }
 
@@ -113,7 +123,55 @@ class ReleaseAccountMailCommand extends Command
             InputOption::VALUE_NONE,
             'Send confirmation mails to unconfirmed customers instead of password-setup mails'
         );
+        $this->addOption(
+            self::OPT_IGNORE_THROTTLE,
+            null,
+            InputOption::VALUE_NONE,
+            'Run anyway when core password-reset throttling would block the batch'
+        );
         parent::configure();
+    }
+
+    /**
+     * Core throttles password resets, and a CLI batch runs into it rather than around it.
+     *
+     * Every send from the CLI is recorded with an empty IP, so filterByIpOrAccountReference groups the
+     * whole run together and the quantity cap applies across it regardless of the addresses involved.
+     * Measured on 2.4.8-p5: a batch of six sent one and failed five.
+     *
+     * @param int $count
+     * @return string|null
+     */
+    private function throttleWarning(int $count): ?string
+    {
+        $protection = $this->config->getResetProtection(null);
+
+        // 0 = None, 3 = By Email. Both let a batch of distinct addresses through.
+        if ($protection['type'] === 0 || $protection['type'] === 3) {
+            return null;
+        }
+        if ($protection['max'] > 0 && $count <= $protection['max']) {
+            return null;
+        }
+
+        return sprintf(
+            "<error>Core password-reset throttling would block most of this batch.</error>\n"
+            . "  %d customer(s) to mail, but customer/password/max_number_password_reset_requests is %d\n"
+            . "  and password_reset_protection_type is %d (IP based). Every CLI send is recorded with an\n"
+            . "  empty IP, so the cap applies to the whole run rather than per customer.\n\n"
+            . "  Set the protection to By Email or None for the duration of the release, then put it back:\n"
+            . "    bin/magento config:set customer/password/password_reset_protection_type 3\n"
+            . "    bin/magento cache:flush\n"
+            . "    <run the release>\n"
+            . "    bin/magento config:set customer/password/password_reset_protection_type %d\n"
+            . "    bin/magento cache:flush\n\n"
+            . "  Or pass --%s to proceed and accept the failures.",
+            $count,
+            $protection['max'],
+            $protection['type'],
+            $protection['type'],
+            self::OPT_IGNORE_THROTTLE
+        );
     }
 
     /**
@@ -149,6 +207,14 @@ class ReleaseAccountMailCommand extends Command
 
         if ($rows === []) {
             return Command::SUCCESS;
+        }
+
+        if (!$confirmation && !$dryRun && !$input->getOption(self::OPT_IGNORE_THROTTLE)) {
+            $blocked = $this->throttleWarning(count($rows));
+            if ($blocked !== null) {
+                $output->writeln($blocked);
+                return Command::FAILURE;
+            }
         }
 
         if ($dryRun) {
