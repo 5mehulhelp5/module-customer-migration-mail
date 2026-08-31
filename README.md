@@ -1,4 +1,4 @@
-# BroCode_CustomerMailDeferral
+# BroCode_CustomerMigrationMail
 
 Stop Magento emailing every customer the moment an ERP or migration script creates them, then send each one the mail they actually need — once the shop is ready for them to receive it.
 
@@ -124,8 +124,8 @@ Magento Open Source 2.4.8-p5 or later, PHP 8.3+. Verified against 2.4.8-p5.
 ## Install
 
 ```bash
-composer require brocode/module-customer-mail-deferral
-bin/magento module:enable BroCode_CustomerMailDeferral
+composer require brocode/module-customer-migration-mail
+bin/magento module:enable BroCode_CustomerMigrationMail
 bin/magento setup:upgrade
 ```
 

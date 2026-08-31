@@ -27,7 +27,7 @@
  */
 declare(strict_types=1);
 
-namespace BroCode\CustomerMailDeferral\Model\ResourceModel;
+namespace BroCode\CustomerMigrationMail\Model\ResourceModel;
 
 use Magento\Framework\App\ResourceConnection;
 

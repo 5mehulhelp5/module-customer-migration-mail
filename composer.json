@@ -1,5 +1,5 @@
 {
-    "name": "brocode/module-customer-mail-deferral",
+    "name": "brocode/module-customer-migration-mail",
     "description": "Suppress Magento 2 new-account emails while migrated customers are imported, then send each customer the mail they actually need",
     "type": "magento2-module",
     "license": "MIT",
@@ -27,7 +27,7 @@
             "registration.php"
         ],
         "psr-4": {
-            "BroCode\\CustomerMailDeferral\\": ""
+            "BroCode\\CustomerMigrationMail\\": ""
         }
     }
 }

@@ -29,4 +29,4 @@ declare(strict_types=1);
 
 use Magento\Framework\Component\ComponentRegistrar;
 
-ComponentRegistrar::register(ComponentRegistrar::MODULE, 'BroCode_CustomerMailDeferral', __DIR__);
+ComponentRegistrar::register(ComponentRegistrar::MODULE, 'BroCode_CustomerMigrationMail', __DIR__);

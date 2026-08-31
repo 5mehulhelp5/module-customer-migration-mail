@@ -27,7 +27,7 @@
  */
 declare(strict_types=1);
 
-namespace BroCode\CustomerMailDeferral\Model;
+namespace BroCode\CustomerMigrationMail\Model;
 
 use Magento\Customer\Model\EmailNotificationInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;

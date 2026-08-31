@@ -27,10 +27,10 @@
  */
 declare(strict_types=1);
 
-namespace BroCode\CustomerMailDeferral\Console\Command;
+namespace BroCode\CustomerMigrationMail\Console\Command;
 
-use BroCode\CustomerMailDeferral\Model\AccountMailSender;
-use BroCode\CustomerMailDeferral\Model\ResourceModel\GetCustomersNeedingMail;
+use BroCode\CustomerMigrationMail\Model\AccountMailSender;
+use BroCode\CustomerMigrationMail\Model\ResourceModel\GetCustomersNeedingMail;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
 use Symfony\Component\Console\Command\Command;

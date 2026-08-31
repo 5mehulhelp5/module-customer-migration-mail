@@ -27,9 +27,9 @@
  */
 declare(strict_types=1);
 
-namespace BroCode\CustomerMailDeferral\Plugin;
+namespace BroCode\CustomerMigrationMail\Plugin;
 
-use BroCode\CustomerMailDeferral\Model\Config;
+use BroCode\CustomerMigrationMail\Model\Config;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Model\EmailNotificationInterface;
 use Psr\Log\LoggerInterface;
@@ -101,7 +101,7 @@ class SuppressAccountEmail
         }
 
         $this->logger->info(
-            'BroCode_CustomerMailDeferral: suppressed account email',
+            'BroCode_CustomerMigrationMail: suppressed account email',
             ['customer_id' => $customer->getId(), 'email_type' => $type, 'store_id' => $customerStoreId]
         );
     }

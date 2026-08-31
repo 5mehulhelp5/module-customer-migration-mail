@@ -3,14 +3,14 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Customer\Model\EmailNotificationInterface">
         <plugin name="brocode_suppress_account_email"
-                type="BroCode\CustomerMailDeferral\Plugin\SuppressAccountEmail"/>
+                type="BroCode\CustomerMigrationMail\Plugin\SuppressAccountEmail"/>
     </type>
 
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="brocodeCustomerMailRelease" xsi:type="object">
-                    BroCode\CustomerMailDeferral\Console\Command\ReleaseAccountMailCommand
+                    BroCode\CustomerMigrationMail\Console\Command\ReleaseAccountMailCommand
                 </item>
             </argument>
         </arguments>
@@ -21,13 +21,13 @@
         proxies this command's service graph is constructed against that half-built application and the
         installer dies before it reaches the schema.
     -->
-    <type name="BroCode\CustomerMailDeferral\Console\Command\ReleaseAccountMailCommand">
+    <type name="BroCode\CustomerMigrationMail\Console\Command\ReleaseAccountMailCommand">
         <arguments>
             <argument name="getCustomers" xsi:type="object">
-                BroCode\CustomerMailDeferral\Model\ResourceModel\GetCustomersNeedingMail\Proxy
+                BroCode\CustomerMigrationMail\Model\ResourceModel\GetCustomersNeedingMail\Proxy
             </argument>
             <argument name="sender" xsi:type="object">
-                BroCode\CustomerMailDeferral\Model\AccountMailSender\Proxy
+                BroCode\CustomerMigrationMail\Model\AccountMailSender\Proxy
             </argument>
             <argument name="appState" xsi:type="object">Magento\Framework\App\State\Proxy</argument>
         </arguments>
