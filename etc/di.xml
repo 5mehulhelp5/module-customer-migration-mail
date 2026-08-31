@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Customer\Model\EmailNotificationInterface">
+        <plugin name="brocode_suppress_account_email"
+                type="BroCode\CustomerMailDeferral\Plugin\SuppressAccountEmail"/>
+    </type>
+
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="brocodeCustomerMailRelease" xsi:type="object">
+                    BroCode\CustomerMailDeferral\Console\Command\ReleaseAccountMailCommand
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!--
+        The CLI builds its command list during setup:install, before a default website exists. Without
+        proxies this command's service graph is constructed against that half-built application and the
+        installer dies before it reaches the schema.
+    -->
+    <type name="BroCode\CustomerMailDeferral\Console\Command\ReleaseAccountMailCommand">
+        <arguments>
+            <argument name="getCustomers" xsi:type="object">
+                BroCode\CustomerMailDeferral\Model\ResourceModel\GetCustomersNeedingMail\Proxy
+            </argument>
+            <argument name="sender" xsi:type="object">
+                BroCode\CustomerMailDeferral\Model\AccountMailSender\Proxy
+            </argument>
+            <argument name="appState" xsi:type="object">Magento\Framework\App\State\Proxy</argument>
+        </arguments>
+    </type>
+</config>

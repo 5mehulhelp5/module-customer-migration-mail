@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="brocode_customer_mail" translate="label" type="text" sortOrder="500"
+                 showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Customer Mail Deferral</label>
+            <tab>customer</tab>
+            <resource>Magento_Customer::config_customer</resource>
+            <group id="deferral" translate="label" type="text" sortOrder="10"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Migration</label>
+                <field id="suppress_account_email" translate="label comment" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Suppress New Account Emails</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Turn on while importing migrated customers, then off again. Only the
+                    welcome and set-your-password mails are suppressed; the confirmation mail is always sent,
+                    because without it the customer cannot log in. Order and admin mail are unaffected - use
+                    <em>Advanced &gt; System &gt; Mail Sending Settings</em> if you need to silence everything.]]></comment>
+                </field>
+            </group>
+            <group id="release" translate="label" type="text" sortOrder="20"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Release</label>
+                <field id="password_email_template" translate="label comment" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Password Setup Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <comment><![CDATA[Used by <code>brocode:customer-mail:release</code>. Leave empty to send
+                    exactly what Magento would send (<em>Customers &gt; Password Options &gt; Forgot Email
+                    Template</em>). Set a migration-specific template to say "your account has moved" rather
+                    than "welcome".]]></comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

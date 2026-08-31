@@ -1,0 +1,33 @@
+{
+    "name": "brocode/module-customer-mail-deferral",
+    "description": "Suppress Magento 2 new-account emails while migrated customers are imported, then send each customer the mail they actually need",
+    "type": "magento2-module",
+    "license": "MIT",
+    "version": "1.0.0",
+    "authors": [
+        {
+            "name": "Benjamin Rosenberger",
+            "email": "bensch.rosenberger@gmail.com"
+        }
+    ],
+    "funding": [
+        {
+            "type": "By me a coffee",
+            "url": "https://www.buymeacoffee.com/brosenberger"
+        }
+    ],
+    "require": {
+        "magento/framework": "*",
+        "magento/module-customer": "*",
+        "magento/module-store": "*",
+        "magento/module-config": "*"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "BroCode\\CustomerMailDeferral\\": ""
+        }
+    }
+}

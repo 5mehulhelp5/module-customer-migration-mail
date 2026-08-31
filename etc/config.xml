@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <brocode_customer_mail>
+            <deferral>
+                <suppress_account_email>0</suppress_account_email>
+            </deferral>
+            <release>
+                <!-- Empty means: use whatever customer/password/forgot_email_template resolves to. -->
+                <password_email_template/>
+            </release>
+        </brocode_customer_mail>
+    </default>
+</config>
