@@ -165,3 +165,7 @@ bin/magento setup:upgrade
 ## Licence
 
 MIT — see [LICENSE](LICENSE).
+
+---
+
+Docs, background and related modules: [brocode.at](https://brocode.at/modules/module-customer-migration-mail/)
